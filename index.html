@@ -12,7 +12,7 @@
 html,body{height:100%}
 body{background:#000;color:#fff;font:15px/1.35 -apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
 [hidden]{display:none!important}
-button,input,select{font:inherit;color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
 #app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
 header{display:flex;align-items:center;gap:10px;padding:8px 16px;background:linear-gradient(#1a1305,#000)}
 header img{width:38px;height:38px}header b{color:var(--g);letter-spacing:1px;flex:1}
@@ -29,7 +29,7 @@ h2:before{content:"";display:inline-block;width:4px;height:16px;background:var(-
 .ic{background:none;border:0;font-size:20px;min-width:40px;height:40px;color:#ddd}.ic.on{color:var(--g)}
 .btn{background:var(--g);color:#000;border:0;border-radius:10px;padding:12px 16px;font-weight:700;width:100%;margin:6px 0}
 .btn.s{background:var(--c2);color:#fff}
-input,select{background:var(--c);border:1px solid #2a2a2a;border-radius:10px;padding:12px;width:100%;margin:6px 0}
+input,select,textarea{background:var(--c);border:1px solid #2a2a2a;border-radius:10px;padding:12px;width:100%;margin:6px 0}
 input[type=range]{padding:0;border:0;background:none;accent-color:var(--g)}
 nav{display:flex;border-top:1px solid #1d1d1d;background:#0a0a0a;padding-bottom:env(safe-area-inset-bottom)}
 nav button{flex:1;background:none;border:0;color:var(--m);padding:8px 0;font-size:10px}
@@ -66,6 +66,24 @@ nav button i{display:block;font-style:normal;font-size:20px}nav .on{color:var(--
 @keyframes eq{50%{height:16px}}
 .playing #scv{animation:glow 2.2s infinite ease-in-out}
 @keyframes glow{50%{box-shadow:0 0 44px rgba(245,184,46,.5);transform:scale(1.03)}}
+.seg{display:flex;gap:6px;margin:6px 0}.seg button{flex:1;background:var(--c2);border:0;border-radius:10px;padding:10px}
+.seg .on{background:var(--g);color:#000;font-weight:700}
+.vc{flex:none;width:200px;animation:up .5s both}.vc .cv{width:100%;height:auto;aspect-ratio:16/9;border-radius:12px}
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:12px}.vg .vc{width:100%}
+#vm{position:fixed;inset:0;background:#000;z-index:7;padding-top:env(safe-area-inset-top);overflow-y:auto}
+#vm video,#vm iframe{width:100%;aspect-ratio:16/9;background:#000;border:0;display:block}
+h2,.sc b,.tile b,#rd h2{font-family:Georgia,"Times New Roman",serif;font-weight:700}
+.flag{height:4px;background:linear-gradient(90deg,#009e60 33.33%,#fcd116 33.33% 66.66%,#3a75c4 66.66%)}
+.tl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.tile{background:var(--c);border:1px solid #2a2a2a;border-radius:14px;padding:14px 12px 16px;position:relative;overflow:hidden;min-height:78px}
+.tile b{display:block;font-size:15px;margin-bottom:4px}.tile span{color:var(--m);font-size:12px}
+.tile:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,#009e60 33.33%,#fcd116 33.33% 66.66%,#3a75c4 66.66%)}
+#rd{position:fixed;inset:0;background:#000;z-index:7;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 8px) 18px 30px}
+#rd img{width:100%;border-radius:12px;margin:10px 0}#rd p{margin:10px 0;line-height:1.6;font-size:16px}#rd p.m{font-size:14px}
+.bdg{display:inline-block;border-radius:12px;padding:3px 10px;font-size:12px;font-weight:700}
+footer{padding:30px 0 0;text-align:center;color:var(--m);font-size:12px;line-height:1.7}
+footer b{color:var(--g);display:block;font-size:15px;letter-spacing:1px}
+footer a{color:#ccc;margin:0 6px;text-decoration:underline;white-space:nowrap;display:inline-block;padding:4px 0}
 </style></head><body>
 
 <div id="auth" hidden><div>
@@ -87,7 +105,7 @@ nav button i{display:block;font-style:normal;font-size:20px}nav .on{color:var(--
   <button class="ic" id="mpp">▶</button><button class="ic" id="mnx">⏭</button></div>
  <nav id="nav">
   <button data-tab="home"><i>⌂</i>Accueil</button><button data-tab="explore"><i>⌕</i>Explorer</button>
-  <button data-tab="dl"><i>⇩</i>Téléch.</button><button data-tab="lib"><i>♪</i>Biblio.</button>
+  <button data-tab="cult"><i>✦</i>Culture</button><button data-tab="lib"><i>♪</i>Biblio.</button>
   <button data-tab="me"><i>☺</i>Profil</button>
  </nav>
 </div>
@@ -101,6 +119,8 @@ nav button i{display:block;font-style:normal;font-size:20px}nav .on{color:var(--
  <input type="range" id="vo" min="0" max="1" step="0.05" value="1" aria-label="Volume">
  <h2>File d’attente</h2><div id="sq"></div>
 </div>
+<div id="vm" hidden><button class="ic" id="vx">✕ Fermer</button><div id="vbox"></div><div style="padding:14px"><b id="vt"></b><p class="m" id="vs"></p></div></div>
+<div id="rd" hidden></div>
 <div id="toast" hidden></div>
 <audio id="au" preload="auto"></audio>
 
@@ -111,7 +131,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=s=>{s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const QS='*,artists(name),genres(name)';
-let user=null,profile=null,tab='home',FAV=new Set(),DL=new Set(),L={},T={},Q=[],qi=-1,shuf=false,rep=0,cur=null,curUrl=null,hT=null;
+let cat=null,editArt=null,presetCat=null,xs='music',user=null,profile=null,tab='home',FAV=new Set(),DL=new Set(),L={},T={},Q=[],qi=-1,shuf=false,rep=0,cur=null,curUrl=null,hT=null;
 const au=$('#au');
 function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,3500)}
 
@@ -126,9 +146,67 @@ const norm=r=>({id:r.id,title:r.title,artist:r.artists?.name||'',genre:r.genres?
 // Audius : plateforme de streaming gratuite d'artistes indépendants (écoute légale, sans téléchargement)
 const AUD='https://api.audius.co/v1',AN='app_name=BLINGMONEYMUSIC';
 const aN=r=>({id:'a:'+r.id,ext:1,title:r.title,artist:r.user?.name||'',genre:r.genre||'',cover:r.artwork?.['480x480']||r.artwork?.['150x150']||null,src:`${AUD}/tracks/${r.id}/stream?${AN}`,dur:r.duration});
-async function aj(p){const r=await fetch(`${AUD}${p}${p.includes('?')?'&':'?'}${AN}`);if(!r.ok)throw new Error('Audius '+r.status);return (await r.json()).data.map(aN)}
+async function aj(p){const r=await fetch(`${AUD}${p}${p.includes('?')?'&':'?'}${AN}`);if(!r.ok)throw new Error('Audius '+r.status);return (await r.json()).data.filter(x=>!x.is_stream_gated&&x.is_streamable!==false).map(aN)}
 const aSearch=q=>aj('/tracks/search?limit=14&query='+encodeURIComponent(q));
 const aTrend=g=>aj('/tracks/trending?limit=14'+(g?'&genre='+encodeURIComponent(g):''));
+const aMulti=async qs=>{const r=await Promise.allSettled(qs.map(aSearch)),m=new Map();r.forEach(x=>(x.value||[]).forEach(t=>m.set(t.id,t)));return [...m.values()].slice(0,18)};
+// Vidéos et films : Internet Archive (domaine public / licences libres). YouTube : mets ta clé gratuite ici.
+const YT_KEY='';
+const CONTACT=''; // adresse e-mail publique de contact (laisser vide pour masquer le lien)
+const isEd=()=>!!profile&&['admin','editor'].includes(profile.role);
+const CATS={
+ memoire:{t:'Mémoire musicale du Gabon',d:'Préserver, documenter et transmettre l’histoire de la musique gabonaise.',c:[['pionniers','Les pionniers'],['generations','Les grandes générations'],['legendes','Les légendes'],['femmes','Les femmes dans la musique'],['groupes','Groupes et orchestres historiques'],['studios','Maisons de production et studios'],['aujourdhui','La musique gabonaise aujourd’hui']]},
+ sources:{t:'Retour aux sources : le Gabon, notre identité',d:'Découvrir le patrimoine gabonais : peuples, traditions, savoirs et histoire.',c:[['peuples','Peuples et langues'],['musiques','Musiques traditionnelles'],['danses','Danses traditionnelles'],['instruments','Instruments traditionnels'],['rites','Rites, cérémonies et transmission'],['mode','Mode et tenues traditionnelles'],['gastro','Gastronomie gabonaise'],['contes','Contes, proverbes et traditions orales'],['patrimoine','Patrimoine et histoire']]}};
+const LEGAL={
+ about:['À propos','BLING MONEY MUSIC est une plateforme musicale, culturelle et audiovisuelle née au Gabon, ouverte à l’Afrique et au monde. Elle réunit la musique, le cinéma, les vidéos, les artistes et le patrimoine gabonais. Slogan : « La musique à portée de main ».'],
+ privacy:['Confidentialité','Si tu crées un compte, nous conservons ton adresse e-mail, ton nom affiché, tes favoris et ton historique d’écoute pour faire fonctionner l’application. Ces données sont hébergées chez Supabase. Les musiques et vidéos externes viennent d’Audius et d’Internet Archive, qui ont leurs propres règles. Nous ne vendons pas tes données. Texte provisoire, à faire valider par un juriste avant le lancement officiel.'],
+ terms:['Conditions d’utilisation','L’application est destinée à un usage personnel. Il est interdit de copier, extraire ou redistribuer les contenus sans l’accord des ayants droit. Les artistes qui publient garantissent détenir les droits sur leurs œuvres. Les contenus peuvent être retirés après signalement. Texte provisoire, à faire valider par un juriste avant le lancement officiel.'],
+ copyright:['Droits d’auteur','Chaque œuvre appartient à ses auteurs et ayants droit. Les titres externes sont diffusés en streaming par leurs plateformes d’origine. Si tu penses qu’un contenu porte atteinte à tes droits, utilise « Signaler un contenu ». Un dépôt sur BLING MONEY MUSIC n’est pas un enregistrement officiel de propriété intellectuelle et ne garantit pas juridiquement la titularité des droits.']};
+function openReader(h){const r=$('#rd');r.innerHTML='<button class="ic" id="rx">✕ Fermer</button>'+h;r.hidden=false;r.scrollTop=0}
+function openLegal(k){const [t,x]=LEGAL[k];openReader(`<h2>${esc(t)}</h2><p>${esc(x)}</p>`)}
+function openReport(){openReader('<h2>Signaler un contenu</h2><p class="m">Indique le contenu (titre, artiste ou lien) et la raison du signalement.</p><input id="rt" placeholder="Titre, artiste ou lien du contenu"><textarea id="rr" rows="5" placeholder="Raison du signalement"></textarea><button class="btn" id="rs">Envoyer</button><p class="m" id="rm"></p>');
+ $('#rs').onclick=async()=>{const reason=$('#rr').value.trim();if(!reason)return $('#rm').textContent='Écris la raison du signalement.';const {error}=await SB.from('reports').insert({reporter_id:user?.id||null,target:$('#rt').value.trim()||null,reason});$('#rm').textContent=error?'Erreur : '+error.message:'✓ Merci, le signalement a été envoyé.'}}
+const FOOT=()=>`<footer><b>BLING MONEY MUSIC</b>« La musique à portée de main »<br>Musique | Cinéma | Culture | Artistes | Patrimoine<br><a data-legal="about">À propos</a>${CONTACT?`<a href="mailto:${esc(CONTACT)}">Contact</a>`:''}<a data-legal="privacy">Confidentialité</a><a data-legal="terms">Conditions d’utilisation</a><a data-legal="copyright">Droits d’auteur</a><a data-report>Signaler un contenu</a><br>© 2026 BLING MONEY MUSIC. Tous droits réservés.<br>Conception et développement : Bling Money Music · Version 2.0<div class="flag" style="margin:18px -16px -24px"></div></footer>`;
+async function openArt(id){const {data:a,error}=await SB.from('articles').select('*').eq('id',id).single();if(error)return toast(error.message);
+ const vb={verified:['Information vérifiée','#009e60'],testimony:['Témoignage','#fcd116'],to_confirm:['À confirmer','#3a75c4']}[a.verification]||['À confirmer','#3a75c4'];
+ const src=(a.sources||[]).map(x=>`<li>${x.url&&/^https?:\/\//.test(x.url)?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:var(--g)">${esc(x.title||x.url)}</a>`:esc(x.title||'')}</li>`).join('');
+ openReader(`<h2 style="margin-top:6px">${esc(a.title)}</h2><span class="bdg" style="background:${vb[1]};color:#000">${vb[0]}</span>${a.cover_url?`<img src="${esc(a.cover_url)}" alt="">`:''}<p class="m" style="font-style:italic">${esc(a.summary||'')}</p>${(a.body||'').split(/\n\s*\n/).map(x=>`<p>${esc(x)}</p>`).join('')}<h2>Sources consultées</h2>${src?`<ul style="padding-left:20px">${src}</ul>`:'<p class="m">Aucune source renseignée : ce dossier ne doit pas être considéré comme vérifié.</p>'}${isEd()?`<button class="btn s" data-editart="${a.id}">Modifier</button>`:''}`)}
+async function catView(v){const [sc,k]=cat.split(':'),nm=CATS[sc].c.find(x=>x[0]===k)[1];
+ const {data,error}=await SB.from('articles').select('id,title,summary,cover_url').eq('section',sc).eq('category',k).eq('status','published').order('created_at',{ascending:false});if(error)throw error;
+ v.innerHTML=`<button class="ic" data-back>‹ Retour</button><h2>${esc(nm)}</h2>`+(k==='rites'?'<p class="m">Les éléments sacrés, confidentiels ou réservés aux initiés ne sont pas publiés sans autorisation appropriée.</p>':'')+(data.length?data.map(a=>`<div class="row" data-art="${a.id}"><div class="cv">${a.cover_url?`<img src="${esc(a.cover_url)}" alt="" onerror="this.remove()">`:''}</div><div class="tx"><b>${esc(a.title)}</b><span>${esc(a.summary||'')}</span></div></div>`).join(''):'<p class="m">Aucun dossier publié pour le moment. Chaque dossier est rédigé à partir de sources vérifiées avant sa publication.</p>')+(isEd()?`<button class="btn" data-newart="${esc(cat)}">+ Ajouter un dossier ici</button>`:'')}
+async function saveArt(){const m=$('#wmsg'),title=$('#wt').value.trim();if(!title)return m.textContent='Le titre est obligatoire.';
+ const sources=$('#wr').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const mt=l.match(/^(.*?)\s*[—–-]\s*(https?:\/\/\S+)$/)||l.match(/^()(https?:\/\/\S+)$/);return mt?{title:mt[1]||mt[2],url:mt[2]}:{title:l}});
+ $('#wk').disabled=true;m.textContent='Enregistrement…';
+ try{const row={section:$('#ws').value,category:$('#wc').value,title,summary:$('#wm').value.trim()||null,body:$('#wb').value,sources,verification:$('#wv').value,status:$('#wp').value,updated_at:new Date().toISOString()};
+  const f=$('#wi').files[0];if(f){const u=await SB.storage.from('covers').upload(`articles/${Date.now()}-${safe(f.name)}`,f);if(u.error)throw u.error;row.cover_url=SB.storage.from('covers').getPublicUrl(u.data.path).data.publicUrl}
+  const r=editArt?await SB.from('articles').update(row).eq('id',editArt):await SB.from('articles').insert({...row,author_id:user.id});
+  if(r.error)throw r.error;editArt=null;presetCat=null;toast('Dossier enregistré');render()
+ }catch(e){m.textContent='Erreur : '+e.message;$('#wk').disabled=false}}
+const VT={};
+async function iaSearch(q,col,rows=20){const qq=(q?`(${q}) AND `:'')+'mediatype:movies'+(col?` AND collection:${col}`:'');
+ const u=`https://archive.org/advancedsearch.php?q=${encodeURIComponent(qq)}&fl%5B%5D=identifier&fl%5B%5D=title&fl%5B%5D=creator&rows=${rows}&sort%5B%5D=downloads+desc&output=json`;
+ const r=await fetch(u);if(!r.ok)throw new Error('Archive '+r.status);
+ return (await r.json()).response.docs.map(d=>({vid:'ia:'+d.identifier,title:String(d.title||d.identifier),sub:[].concat(d.creator||'').join(', '),cover:`https://archive.org/services/img/${d.identifier}`}))}
+async function ytSearch(q){const r=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=20&q=${encodeURIComponent(q)}&key=${YT_KEY}`);if(!r.ok)throw new Error('YouTube '+r.status);
+ return (await r.json()).items.map(i=>({vid:'yt:'+i.id.videoId,title:i.snippet.title,sub:i.snippet.channelTitle,cover:i.snippet.thumbnails.medium.url}))}
+const vcard=v=>{VT[v.vid]=v;return `<div class="vc" data-vid="${esc(v.vid)}"><div class="cv">${v.cover?`<img src="${esc(v.cover)}" loading="lazy" alt="" onerror="this.remove()">`:''}<span class="pl">▶</span></div><b style="display:block;margin-top:4px;font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(v.title)}</b></div>`};
+const vsec=(h,l)=>l&&l.length?`<h2>${esc(h)}</h2><div class="hs">${l.map(vcard).join('')}</div>`:'';
+async function findVid(q){const r=$('#res');r.innerHTML='<p class="m">Chargement…</p>';
+ try{const l=(xs==='videos'&&YT_KEY&&q)?await ytSearch(q):await iaSearch(q,xs==='films'?'feature_films':'opensource_movies',24);
+  r.innerHTML=l.length?`<div class="vg">${l.map(vcard).join('')}</div>`+(xs==='videos'&&!YT_KEY?'<p class="m" style="font-size:12px">Source : Internet Archive (vidéos libres de droits).</p>':''):'<p class="m">Aucun résultat. Essaie un mot en anglais.</p>'}
+ catch(e){r.innerHTML=`<p class="m">Erreur : ${esc(e.message)}</p>`}}
+async function openVideo(id){const v=VT[id];if(!v)return;au.pause();$('#vm').hidden=false;$('#vt').textContent=v.title;$('#vs').textContent=v.sub;const b=$('#vbox');
+ if(id.startsWith('yt:')){b.innerHTML=`<iframe src="https://www.youtube.com/embed/${encodeURIComponent(id.slice(3))}?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;return}
+ b.innerHTML='<p class="m" style="padding:16px">Chargement du film…</p>';
+ try{const ident=id.slice(3),m=await (await fetch('https://archive.org/metadata/'+encodeURIComponent(ident))).json();
+  const f=(m.files||[]).filter(x=>/\.mp4$/i.test(x.name)).sort((a,c)=>(c.format==='h.264')-(a.format==='h.264'))[0]||(m.files||[]).find(x=>/\.(webm|ogv)$/i.test(x.name));
+  if(!f)throw new Error('aucune vidéo lisible');
+  b.innerHTML=`<video controls autoplay playsinline src="https://archive.org/download/${encodeURIComponent(ident)}/${f.name.split('/').map(encodeURIComponent).join('/')}"></video>`;
+  const md=m.metadata||{},one=x=>[].concat(x||'').join(', '),vd=b.querySelector('video'),key='pos:'+ident;
+  $('#vs').innerHTML=[one(md.creator)&&'Réalisation / auteur : '+esc(one(md.creator)),(md.year||md.date)&&'Année : '+esc(String(md.year||md.date).slice(0,4)),md.runtime&&'Durée : '+esc(one(md.runtime)),md.language&&'Langue : '+esc(one(md.language)),md.licenseurl?'Licence : '+esc(one(md.licenseurl)):'Licence non précisée : domaine public présumé, à vérifier avant tout usage commercial.'].filter(Boolean).join('<br>')+(md.description?'<br><br>'+esc(one(md.description).replace(/<[^>]*>/g,' ').slice(0,600)):'');
+  vd.onloadedmetadata=()=>{const q=+localStorage.getItem(key);if(q>5&&q<vd.duration-10)vd.currentTime=q};let lt=0;
+  vd.ontimeupdate=()=>{if(Date.now()-lt>4000){lt=Date.now();try{localStorage.setItem(key,vd.currentTime)}catch(e){}}}
+ }catch(e){b.innerHTML=`<p class="m" style="padding:16px">Lecture impossible : ${esc(e.message)}</p>`}}
 
 /* ---------- Affichage ---------- */
 const img=t=>t.cover?`<img src="${esc(t.cover)}" loading="lazy" alt="" onerror="this.remove()">`:'';
@@ -140,39 +218,54 @@ const needLogin=m=>`<p class="m">${m}</p><button class="btn" data-login>Se conne
 
 const views={
 async home(v){await refDL();
- const jobs=[SB.from('tracks').select(QS).eq('status','approved').order('published_at',{ascending:false}).limit(30).then(r=>(r.data||[]).map(norm)),aTrend(),aSearch('afrobeat'),aSearch('amapiano'),aSearch('gospel'),aSearch('gabon'),aTrend('Hip-Hop/Rap'),aTrend('R&B/Soul')];
- const [own,tr,afro,ama,gos,gab,hip,rnb]=(await Promise.allSettled(jobs)).map(x=>x.value||[]);
+ const jobs=[SB.from('tracks').select(QS).eq('status','approved').order('published_at',{ascending:false}).limit(30).then(r=>(r.data||[]).map(norm)),aTrend(),aMulti(['afrobeat','afrobeats','africa']),aMulti(['amapiano']),aMulti(['gospel']),aMulti(['gabon','gabonais','libreville']),aTrend('Hip-Hop/Rap'),aTrend('R&B/Soul'),iaSearch('','feature_films',12)];
+ const [own,tr,afro,ama,gos,gab,hip,rnb,fil]=(await Promise.allSettled(jobs)).map(x=>x.value||[]);
  const hero=[...own.slice(0,3),...tr.slice(0,5)].filter(t=>t.cover).slice(0,6);L.hero=hero;
  if(!own.length&&!tr.length){v.innerHTML='<p class="m">Impossible de charger la musique. Vérifie ta connexion Internet, ou ouvre l’onglet Téléch. pour écouter hors ligne.</p>';return}
  let h=hero.length?`<div id="hero">${hero.map((t,i)=>`<div class="sl ${i?'':'on'}"><div class="bg" style="background-image:url('${esc(t.cover)}')"></div><div class="sc"><span class="m">${t.ext?'TENDANCE':'BLING MONEY MUSIC'}</span><b style="font-size:21px;display:block">${esc(t.title)}</b><span class="m" style="color:#ddd">${esc(t.artist)}</span><br><button class="btn" style="width:auto;padding:8px 18px" data-play="hero:${i}">▶ Écouter</button></div></div>`).join('')}</div>`:'';
- h+=hsec('Catalogue BLING MONEY',own,'own')+hsec('Tendances musicales',tr,'tr')+hsec('Afrobeat',afro,'af')+hsec('Amapiano',ama,'am')+hsec('Musiques gabonaises',gab,'ga')+hsec('Gospel',gos,'go')+hsec('Hip-hop',hip,'hi')+hsec('R&B',rnb,'rb');
+ h+='<div class="tl"><div class="tile" data-go="cult"><b>Mémoire musicale du Gabon</b><span>Histoire, pionniers, légendes</span></div><div class="tile" data-go="cult"><b>Retour aux sources</b><span>Le Gabon, notre identité</span></div></div>';
+ h+=hsec('Catalogue BLING MONEY',own,'own')+hsec('Tendances musicales',tr,'tr')+hsec('Afrobeat',afro,'af')+hsec('Amapiano',ama,'am')+hsec('Musiques gabonaises',gab,'ga')+hsec('Gospel',gos,'go')+hsec('Hip-hop',hip,'hi')+hsec('R&B',rnb,'rb')+vsec('Bling Cinéma · films gratuits',fil);
  h+='<p class="m" style="font-size:12px;text-align:center">Musique sur Internet fournie par Audius (écoute uniquement).</p>';v.innerHTML=h;
  let hi=0;hT=setInterval(()=>{const s=$$('.sl');if(s.length<2)return;s[hi].classList.remove('on');hi=(hi+1)%s.length;s[hi].classList.add('on')},5500)},
-async explore(v){v.innerHTML=`<input id="q" type="search" placeholder="Chanson, artiste, genre…"><div class="chips">${['Afrobeat','Amapiano','Gospel','Hip-hop','R&B','Gabon','Rumba','Coupé-décalé','Zouk'].map(x=>`<button data-s="${esc(x)}">${esc(x)}</button>`).join('')}</div><div id="res"></div>`;
- let tm;$('#q').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>find(e.target.value),350)}},
+async explore(v){const C={music:['Afrobeat','Amapiano','Gospel','Hip-hop','R&B','Gabon','Rumba','Coupé-décalé','Zouk'].map(x=>[x,x]),films:[['Action','action'],['Comédie','comedy'],['Horreur','horror'],['Science-fiction','sci-fi'],['Western','western'],['Documentaire','documentary'],['Afrique','africa'],['Dessin animé','cartoon']],videos:[['Afrobeat','afrobeat'],['Gabon','gabon'],['Concert','concert'],['Gospel','gospel'],['Documentaire','documentary'],['Sport','sports']]}[xs];
+ v.innerHTML=`<div class="seg">${[['music','Musique'],['films','Bling Cinéma'],['videos','Bling Video']].map(([k,n])=>`<button data-xs="${k}" class="${xs===k?'on':''}">${n}</button>`).join('')}</div><input id="q" type="search" placeholder="${xs==='music'?'Chanson, artiste, genre…':xs==='films'?'Chercher un film…':'Chercher une vidéo…'}"><div class="chips">${C.map(([n,q])=>`<button data-s="${esc(q)}">${esc(n)}</button>`).join('')}</div><div id="res"></div>`;
+ let tm;$('#q').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>find(e.target.value),350)};if(xs!=='music')find('')},
 async dl(v){const a=await dlAll();DL=new Set(a.map(x=>x.id));const l=a.map(x=>x.t);L.d=l;const mb=(a.reduce((s,x)=>s+x.size,0)/1048576).toFixed(1);
  v.innerHTML=`<h2>Ma musique hors ligne</h2><p class="m">${l.length} titre(s) · ${mb} Mo sur ce téléphone. Appuie sur ✓ pour supprimer un téléchargement.</p>`+(l.length?l.map((t,i)=>row(t,'d',i)).join(''):'<p class="m">Aucun téléchargement. Les titres du Catalogue BLING MONEY autorisés ont un bouton ⇩.</p>')},
 async lib(v){if(!user){v.innerHTML=needLogin('Connecte-toi pour retrouver tes favoris et ton historique.');return}await refDL();
  const [f,h]=await Promise.all([SB.from('favorites').select(`tracks(${QS})`).eq('user_id',user.id).order('created_at',{ascending:false}),SB.from('plays').select(`tracks(${QS})`).eq('user_id',user.id).order('played_at',{ascending:false}).limit(40)]);
  const fl=(f.data||[]).map(x=>x.tracks).filter(Boolean).map(norm),seen=new Set(),hl=(h.data||[]).map(x=>x.tracks).filter(x=>x&&!seen.has(x.id)&&seen.add(x.id)).map(norm);
- v.innerHTML=(fl.length?sec('Mes favoris',fl,'f'):'<h2>Mes favoris</h2><p class="m">Appuie sur ♡ pour ajouter un titre du catalogue BLING MONEY.</p>')+(hl.length?sec('Historique d’écoute',hl.slice(0,15),'h'):'')},
+ v.innerHTML='<button class="btn s" data-go="dl">⇩ Ma musique hors ligne</button>'+(fl.length?sec('Mes favoris',fl,'f'):'<h2>Mes favoris</h2><p class="m">Appuie sur ♡ pour ajouter un titre du catalogue BLING MONEY.</p>')+(hl.length?sec('Historique d’écoute',hl.slice(0,15),'h'):'')},
 async me(v){if(!user){v.innerHTML='<h2>Profil</h2>'+needLogin('Tu écoutes en invité. Crée un compte pour les favoris, l’historique et les téléchargements.');return}
- v.innerHTML=`<h2>Mon profil</h2><p class="m">${esc(user.email)}${profile?.role==='admin'?' · Administrateur':''}</p><input id="dn" placeholder="Nom affiché" value="${esc(profile?.display_name)}"><button class="btn" id="sv">Enregistrer</button>${profile?.role==='admin'?'<button class="btn s" data-go="admin">Espace administrateur</button>':''}<button class="btn s" id="lo">Se déconnecter</button><p class="m">Pour installer l’app : sur iPhone, bouton Partager puis « Sur l’écran d’accueil ».</p>`;
+ v.innerHTML=`<h2>Mon profil</h2><p class="m">${esc(user.email)}${profile?.role==='admin'?' · Administrateur':''}</p><input id="dn" placeholder="Nom affiché" value="${esc(profile?.display_name)}"><button class="btn" id="sv">Enregistrer</button>${isEd()?'<button class="btn s" data-go="admin">Espace '+(profile.role==='admin'?'administrateur':'éditorial')+'</button>':''}<button class="btn s" id="lo">Se déconnecter</button><p class="m">Pour installer l’app : sur iPhone, bouton Partager puis « Sur l’écran d’accueil ».</p>`;
  $('#sv').onclick=async()=>{const {error}=await SB.from('profiles').update({display_name:$('#dn').value}).eq('id',user.id);toast(error?error.message:'Profil enregistré')};
  $('#lo').onclick=()=>SB.auth.signOut()},
-async admin(v){if(profile?.role!=='admin'){v.innerHTML='<p class="m">Accès réservé.</p>';return}
+async cult(v){if(cat)return catView(v);
+ const {data}=await SB.from('articles').select('section,category').eq('status','published');const n={};(data||[]).forEach(a=>{const k=a.section+':'+a.category;n[k]=(n[k]||0)+1});
+ v.innerHTML=Object.entries(CATS).map(([sc,o])=>`<h2>${esc(o.t)}</h2><p class="m">${esc(o.d)}</p><div class="tl">${o.c.map(([k,t])=>`<div class="tile" data-cat="${sc}:${k}"><b>${esc(t)}</b><span>${n[sc+':'+k]?n[sc+':'+k]+' dossier(s)':'Dossiers à venir'}</span></div>`).join('')}</div>`).join('')},
+async admin(v){if(!isEd()){v.innerHTML='<p class="m">Accès réservé.</p>';return}
+ v.innerHTML='';const d1=document.createElement('div');v.appendChild(d1);if(profile.role==='admin')await views.adminTracks(d1);
+ const ed=editArt?(await SB.from('articles').select('*').eq('id',editArt)).data?.[0]:null;
+ const [ps,pc]=(ed?ed.section+':'+ed.category:(presetCat||'memoire:pionniers')).split(':');
+ const {data:all}=await SB.from('articles').select('id,title,status,section,category').order('created_at',{ascending:false}).limit(30);
+ const rp=profile.role==='admin'?((await SB.from('reports').select('*').eq('handled',false).order('created_at',{ascending:false}).limit(10)).data||[]):[];
+ const o=(a,sel)=>a.map(([k,t])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(t)}</option>`).join('');
+ v.insertAdjacentHTML('beforeend',`<h2>${ed?'Modifier le dossier':'Rédiger un dossier'}</h2><select id="ws">${o(Object.entries(CATS).map(([k,x])=>[k,x.t]),ps)}</select><select id="wc">${o(CATS[ps].c,pc)}</select><input id="wt" placeholder="Titre" value="${esc(ed?.title)}"><input id="wm" placeholder="Résumé (une phrase)" value="${esc(ed?.summary)}"><textarea id="wb" rows="10" placeholder="Texte du dossier (sépare les paragraphes par une ligne vide)">${esc(ed?.body)}</textarea><textarea id="wr" rows="4" placeholder="Sources, une par ligne : Titre — https://lien">${esc((ed?.sources||[]).map(x=>x.url?x.title+' — '+x.url:x.title).join('\n'))}</textarea><select id="wv">${o([['verified','Information vérifiée'],['testimony','Témoignage'],['to_confirm','À confirmer']],ed?.verification||'to_confirm')}</select><p class="m">Image (facultative)</p><input id="wi" type="file" accept="image/*"><select id="wp">${o([['published','Publier'],['draft','Brouillon']],ed?.status||'draft')}</select><button class="btn" id="wk">Enregistrer le dossier</button>${ed?'<button class="btn s" id="wcn" data-go="admin">Annuler la modification</button>':''}<p class="m" id="wmsg"></p><h2>Dossiers existants</h2>${(all||[]).length?all.map(a=>`<div class="row"><div class="tx"><b>${esc(a.title)}</b><span>${esc(a.section)}/${esc(a.category)} · ${a.status==='published'?'publié':'brouillon'}</span></div><button class="ic" data-editart="${a.id}">✎</button><button class="ic" data-delart="${a.id}">🗑</button></div>`).join(''):'<p class="m">Aucun dossier.</p>'}${profile.role==='admin'?`<h2>Signalements à traiter</h2>${rp.length?rp.map(r=>`<div class="row"><div class="tx"><b>${esc(r.target||'(sans précision)')}</b><span>${esc(r.reason)}</span></div><button class="ic" data-rep="${r.id}">✓</button></div>`).join(''):'<p class="m">Aucun signalement.</p>'}`:''}`);
+ $('#ws').onchange=()=>{$('#wc').innerHTML=o(CATS[$('#ws').value].c)};$('#wk').onclick=saveArt;
+ if(ed)$('#wcn').onclick=()=>{editArt=null;presetCat=null}},
+async adminTracks(v){if(profile?.role!=='admin'){v.innerHTML='<p class="m">Accès réservé.</p>';return}
  const {data:gs}=await SB.from('genres').select('id,name').order('name');
  v.innerHTML=`<h2>Ajouter un titre</h2><input id="aa" placeholder="Nom de l’artiste"><input id="at" placeholder="Titre"><input id="ap" placeholder="Producteur (facultatif)"><select id="ag">${gs.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}</select><p class="m">Fichier audio (mp3, m4a)</p><input id="af" type="file" accept="audio/*,video/mp4,.mp3,.m4a,.aac,.wav,.mp4"><p class="m" id="afn">Aucun fichier choisi</p><p class="m">Pochette (image)</p><input id="ac" type="file" accept="image/*"><label class="m"><input id="ar" type="checkbox" style="width:auto"> J’ai les droits : téléchargement autorisé</label><button class="btn" id="as">Publier</button><p class="m" id="am"></p>`;
  $('#af').onchange=e=>{const f=e.target.files[0];$('#afn').textContent=f?'✓ '+f.name+' ('+(f.size/1048576).toFixed(1)+' Mo)':'Aucun fichier choisi'};
  $('#as').onclick=publish}
 };
-async function render(){clearInterval(hT);const v=$('#view');$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab||(tab==='admin'&&b.dataset.tab==='me')));v.innerHTML='<p class="m">Chargement…</p>';
- try{await views[tab](v)}catch(e){v.innerHTML=`<p class="m">Erreur : ${esc(e.message)}</p>`}}
+async function render(){clearInterval(hT);const v=$('#view');$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab||(tab==='admin'&&b.dataset.tab==='me')||(tab==='dl'&&b.dataset.tab==='lib')));v.innerHTML='<p class="m">Chargement…</p>';
+ try{await views[tab](v)}catch(e){v.innerHTML=`<p class="m">Erreur : ${esc(e.message)}</p>`}v.insertAdjacentHTML('beforeend',FOOT())}
 
 async function ownSearch(q){const [a,g]=await Promise.all([SB.from('artists').select('id').eq('status','approved').ilike('name',`%${q}%`),SB.from('genres').select('id').ilike('name',`%${q}%`)]);
  let f=`title.ilike.%${q}%,producer.ilike.%${q}%`;if(a.data?.length)f+=`,artist_id.in.(${a.data.map(x=>x.id).join(',')})`;if(g.data?.length)f+=`,genre_id.in.(${g.data.map(x=>x.id).join(',')})`;
  const {data}=await SB.from('tracks').select(QS).eq('status','approved').or(f).limit(30);return (data||[]).map(norm)}
-async function find(q){const r=$('#res');q=(q||'').replace(/[,()%*]/g,' ').trim();if(!q){r.innerHTML='';return}r.innerHTML='<p class="m">Recherche…</p>';
+async function find(q){const r=$('#res');q=(q||'').replace(/[,()%*]/g,' ').trim();if(xs!=='music')return findVid(q);if(!q){r.innerHTML='';return}r.innerHTML='<p class="m">Recherche…</p>';
  const [own,ext]=await Promise.allSettled([ownSearch(q),aSearch(q)]);await refDL();let h='';
  if(own.value?.length)h+=sec('Catalogue BLING MONEY',own.value,'so');if(ext.value?.length)h+=sec('Sur Internet (Audius)',ext.value,'se');
  r.innerHTML=h||'<p class="m">Aucun résultat.</p>'}
@@ -195,14 +288,15 @@ async function dl(id,b){const t=T[id];if(!t)return;
  }catch(e){b.textContent='⇩';toast('Échec du téléchargement : '+e.message)}}
 
 /* ---------- Lecteur ---------- */
-async function playIdx(i){if(i<0||i>=Q.length)return;qi=i;cur=Q[i];let src;
+let pTok=0,rt=0;
+async function playIdx(i){if(i<0||i>=Q.length)return;const tok=++pTok;rt=0;qi=i;cur=Q[i];let src;setUI();
  if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}
  if(cur.ext){if(!navigator.onLine)return toast('Hors connexion : ce titre nécessite Internet');src=cur.src}
  else{const loc=await dlGet(cur.id);
   if(loc){src=curUrl=URL.createObjectURL(loc.blob)}
   else{if(!navigator.onLine)return toast('Hors connexion : ce titre n’est pas téléchargé');const {data,error}=await SB.storage.from('audio').createSignedUrl(cur.path,3600);if(error)return toast('Lecture impossible : '+error.message);src=data.signedUrl;
    if(user)SB.from('plays').insert({user_id:user.id,track_id:cur.id}).then(()=>{})}}
- au.src=src;try{await au.play()}catch(e){toast('Lecture impossible : '+e.message)}setUI()}
+ if(tok!==pTok)return;au.src=src;try{await au.play()}catch(e){if(tok!==pTok||e.name==='AbortError')return;toast('Lecture impossible : '+e.message)}setUI()}
 function next(auto){if(!Q.length)return;if(shuf&&Q.length>1){let j;do{j=Math.floor(Math.random()*Q.length)}while(j===qi);return playIdx(j)}
  if(qi+1<Q.length)return playIdx(qi+1);if(rep===2||!auto)return playIdx(0)}
 function prev(){if(au.currentTime>3)au.currentTime=0;else playIdx(qi>0?qi-1:0)}
@@ -212,7 +306,7 @@ function setUI(){if(!cur)return;$('#mini').hidden=false;const im=img(cur);
  if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:cur.title,artist:cur.artist,artwork:cur.cover?[{src:cur.cover}]:[{src:new URL('icon-512.png',location.href).href,sizes:'512x512',type:'image/png'}]})}}
 au.addEventListener('timeupdate',()=>{const p=au.duration?au.currentTime/au.duration:0;$('#mbar').style.width=p*100+'%';$('#sk').value=p*1000;$('#tc').textContent=fmt(au.currentTime);$('#td').textContent=fmt(au.duration)});
 au.addEventListener('ended',()=>{if(rep===1)playIdx(qi);else next(true)});
-au.addEventListener('error',()=>{if(au.src)toast('Ce titre ne peut pas être lu pour le moment')});
+au.addEventListener('error',()=>{if(!au.src||!cur)return;if(rt<1){rt++;setTimeout(()=>{au.load();au.play().catch(()=>{})},700);return}rt=0;toast('Titre indisponible, passage au suivant…');setTimeout(()=>next(true),900)});
 ['play','pause'].forEach(ev=>au.addEventListener(ev,()=>{const s=au.paused?'▶':'⏸';$('#mpp').textContent=$('#spp').textContent=s;document.body.classList.toggle('playing',!au.paused);if('mediaSession' in navigator)navigator.mediaSession.playbackState=au.paused?'paused':'playing'}));
 const tog=()=>au.src&&(au.paused?au.play():au.pause());
 $('#mpp').onclick=$('#spp').onclick=tog;$('#mnx').onclick=$('#nx').onclick=()=>next(false);$('#pv').onclick=prev;
@@ -221,6 +315,7 @@ $('#vo').oninput=e=>au.volume=e.target.value;
 $('#sh').onclick=e=>{shuf=!shuf;e.target.classList.toggle('on',shuf)};
 $('#rp').onclick=e=>{rep=(rep+1)%3;e.target.textContent=rep===1?'↻1':'↻';e.target.classList.toggle('on',rep>0)};
 $('#sc').onclick=()=>$('#sheet').hidden=true;
+$('#vx').onclick=()=>{$('#vbox').innerHTML='';$('#vm').hidden=true};
 if('mediaSession' in navigator){const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch(e){}};h('play',()=>au.play());h('pause',()=>au.pause());h('previoustrack',prev);h('nexttrack',()=>next(false));h('seekto',d=>{au.currentTime=d.seekTime})}
 
 /* ---------- Espace administrateur ---------- */
@@ -241,11 +336,23 @@ async function publish(){const m=$('#am'),name=$('#aa').value.trim(),title=$('#a
 /* ---------- Clics ---------- */
 document.addEventListener('click',e=>{const t=e.target;let b;
  if(b=t.closest('[data-login]')){$('#auth').hidden=false;return}
+ if(b=t.closest('[data-xs]')){xs=b.dataset.xs;return render()}
+ if(b=t.closest('[data-cat]')){cat=b.dataset.cat;return render()}
+ if(t.closest('[data-back]')){cat=null;return render()}
+ if(b=t.closest('[data-art]'))return openArt(b.dataset.art);
+ if(b=t.closest('[data-legal]'))return openLegal(b.dataset.legal);
+ if(t.closest('[data-report]'))return openReport();
+ if(t.closest('#rx')){$('#rd').hidden=true;return}
+ if(b=t.closest('[data-newart]')){presetCat=b.dataset.newart;editArt=null;tab='admin';$('#rd').hidden=true;return render()}
+ if(b=t.closest('[data-editart]')){editArt=b.dataset.editart;tab='admin';$('#rd').hidden=true;return render()}
+ if(b=t.closest('[data-delart]')){if(confirm('Supprimer ce dossier définitivement ?'))SB.from('articles').delete().eq('id',b.dataset.delart).then(()=>render());return}
+ if(b=t.closest('[data-rep]')){SB.from('reports').update({handled:true}).eq('id',b.dataset.rep).then(()=>render());return}
+ if(b=t.closest('[data-vid]'))return openVideo(b.dataset.vid);
  if(b=t.closest('[data-dl]'))return dl(b.dataset.dl,b);
  if(b=t.closest('[data-fav]'))return fav(b.dataset.fav);
  if(b=t.closest('[data-s]')){tab='explore';$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.tab==='explore'));const q=$('#q');if(q)q.value=b.dataset.s;return find(b.dataset.s)}
  if(b=t.closest('[data-go]')){tab=b.dataset.go;return render()}
- if(b=t.closest('#nav button')){tab=b.dataset.tab;return render()}
+ if(b=t.closest('#nav button')){tab=b.dataset.tab;cat=null;editArt=null;return render()}
  if(b=t.closest('[data-q]'))return playIdx(+b.dataset.q);
  if(b=t.closest('[data-play]')){const s=b.dataset.play,c=s.lastIndexOf(':');Q=[...L[s.slice(0,c)]];return playIdx(+s.slice(c+1))}
  if(t.closest('#mini')&&!t.closest('button'))$('#sheet').hidden=false});
