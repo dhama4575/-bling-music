@@ -205,9 +205,10 @@ document.addEventListener('click',e=>{const t=e.target;let b;
 
 /* ---------- Connexion ---------- */
 const am2=m=>$('#am2').textContent=m;
-$('#li').onclick=async()=>{const {error}=await SB.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});error?am2(error.message):boot()};
-$('#su').onclick=async()=>{const {data,error}=await SB.auth.signUp({email:$('#em').value.trim(),password:$('#pw').value,options:{data:{display_name:$('#nm').value.trim()}}});
- if(error)am2(error.message);else if(!data.session)am2('Compte créé. Vérifie ton e-mail, puis reviens te connecter.');else boot()};
+const cred=()=>{const email=$('#em').value.trim(),password=$('#pw').value;if(!email||!password){am2('Écris ton e-mail ET ton mot de passe, puis appuie à nouveau.');return null}if(password.length<6){am2('Le mot de passe doit avoir au moins 6 caractères.');return null}am2('Un instant…');return {email,password}};
+$('#li').onclick=async()=>{const c=cred();if(!c)return;const {error}=await SB.auth.signInWithPassword(c);error?am2('Connexion impossible : '+error.message):boot()};
+$('#su').onclick=async()=>{const c=cred();if(!c)return;const {data,error}=await SB.auth.signUp({...c,options:{data:{display_name:$('#nm').value.trim()}}});
+ if(error)am2('Création impossible : '+error.message);else if(!data.session)am2('Compte créé. Vérifie ton e-mail, puis reviens te connecter.');else boot()};
 SB.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){au.pause();$('#mini').hidden=true;boot()}});
 async function boot(){const {data}=await SB.auth.getSession();user=data.session?.user||null;profile=null;FAV=new Set();
  if(user){try{const p=await SB.from('profiles').select('*').eq('id',user.id).single();profile=p.data;const f=await SB.from('favorites').select('track_id');FAV=new Set((f.data||[]).map(x=>x.track_id))}catch(e){}}
