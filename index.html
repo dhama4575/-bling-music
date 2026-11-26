@@ -117,7 +117,7 @@ footer a{color:#ccc;margin:0 6px;text-decoration:underline;white-space:nowrap;di
  <input type="range" id="sk" min="0" max="1000" value="0"><div class="tm"><span id="tc">0:00</span><span id="td">0:00</span></div>
  <div class="ctl"><button class="ic" id="sh">⇄</button><button class="ic" id="pv">⏮</button><button class="ic" id="spp">▶</button><button class="ic" id="nx">⏭</button><button class="ic" id="rp">↻</button></div>
  <input type="range" id="vo" min="0" max="1" step="0.05" value="1" aria-label="Volume">
- <h2>File d’attente</h2><div id="sq"></div>
+ <div id="social"></div><h2>File d’attente</h2><div id="sq"></div>
 </div>
 <div id="vm" hidden><button class="ic" id="vx">✕ Fermer</button><div id="vbox"></div><div style="padding:14px"><b id="vt"></b><p class="m" id="vs"></p></div></div>
 <div id="rd" hidden></div>
@@ -130,7 +130,7 @@ const SB=supabase.createClient('https://sczsgewnwhvkycdodibh.supabase.co','sb_pu
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=s=>{s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-const QS='*,artists(name),genres(name)';
+const QS='*,artists(name,verified,human_verified),genres(name)';
 let cat=null,editArt=null,presetCat=null,xs='music',user=null,profile=null,tab='home',FAV=new Set(),DL=new Set(),L={},T={},Q=[],qi=-1,shuf=false,rep=0,cur=null,curUrl=null,hT=null;
 const au=$('#au');
 function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,3500)}
@@ -142,7 +142,7 @@ const dlAll=()=>dbx('readonly',s=>s.getAll()),dlGet=id=>dbx('readonly',s=>s.get(
 const refDL=async()=>{try{DL=new Set((await dlAll()).map(x=>x.id))}catch(e){}};
 
 /* ---------- Sources de musique ---------- */
-const norm=r=>({id:r.id,title:r.title,artist:r.artists?.name||'',genre:r.genres?.name||'',cover:r.cover_url,path:r.audio_path,dur:r.duration_seconds,dlable:r.downloadable});
+const norm=r=>({id:r.id,title:r.title,artist:r.artists?.name||'',genre:r.genres?.name||'',cover:r.cover_url,path:r.audio_path,dur:r.duration_seconds,dlable:r.downloadable,aid:r.artist_id,vf:r.artists?.verified,hv:r.artists?.human_verified});
 // Audius : plateforme de streaming gratuite d'artistes indépendants (écoute légale, sans téléchargement)
 const AUD='https://api.audius.co/v1',AN='app_name=BLINGMONEYMUSIC';
 const aN=r=>({id:'a:'+r.id,ext:1,title:r.title,artist:r.user?.name||'',genre:r.genre||'',cover:r.artwork?.['480x480']||r.artwork?.['150x150']||null,src:`${AUD}/tracks/${r.id}/stream?${AN}`,dur:r.duration});
@@ -241,7 +241,7 @@ async lib(v){if(!user){v.innerHTML=needLogin('Connecte-toi pour retrouver tes fa
  const fl=(f.data||[]).map(x=>x.tracks).filter(Boolean).map(norm),seen=new Set(),hl=(h.data||[]).map(x=>x.tracks).filter(x=>x&&!seen.has(x.id)&&seen.add(x.id)).map(norm);
  v.innerHTML='<button class="btn s" data-go="dl">⇩ Ma musique hors ligne</button>'+(fl.length?sec('Mes favoris',fl,'f'):'<h2>Mes favoris</h2><p class="m">Appuie sur ♡ pour ajouter un titre du catalogue BLING MONEY.</p>')+(hl.length?sec('Historique d’écoute',hl.slice(0,15),'h'):'')},
 async me(v){if(!user){v.innerHTML='<h2>Profil</h2>'+needLogin('Tu écoutes en invité. Crée un compte pour les favoris, l’historique et les téléchargements.');return}
- v.innerHTML=`<h2>Mon profil</h2><p class="m">${esc(user.email)}${profile?.role==='admin'?' · Administrateur':''}</p><input id="dn" placeholder="Nom affiché" value="${esc(profile?.display_name)}"><button class="btn" id="sv">Enregistrer</button>${isEd()?'<button class="btn s" data-go="admin">Espace '+(profile.role==='admin'?'administrateur':'éditorial')+'</button>':''}<button class="btn s" id="lo">Se déconnecter</button><p class="m">Pour installer l’app : sur iPhone, bouton Partager puis « Sur l’écran d’accueil ».</p>`;
+ v.innerHTML=`<h2>Mon profil</h2><p class="m">${esc(user.email)}${profile?.role==='admin'?' · Administrateur':''}</p><input id="dn" placeholder="Nom affiché" value="${esc(profile?.display_name)}"><button class="btn" id="sv">Enregistrer</button>${isEd()?'<button class="btn s" data-go="admin">Espace '+(profile.role==='admin'?'administrateur':'éditorial')+'</button>':''}<button class="btn s" data-go="studio">🎤 Studio artiste</button>${typeof isMod==='function'&&isMod()?'<button class="btn s" data-go="mod">🛡 Modération</button>':''}<button class="btn s" id="lo">Se déconnecter</button><p class="m">Pour installer l’app : sur iPhone, bouton Partager puis « Sur l’écran d’accueil ».</p>`;
  $('#sv').onclick=async()=>{const {error}=await SB.from('profiles').update({display_name:$('#dn').value}).eq('id',user.id);toast(error?error.message:'Profil enregistré')};
  $('#lo').onclick=()=>SB.auth.signOut()},
 async cult(v){if(cat)return catView(v);
@@ -263,7 +263,7 @@ async adminTracks(v){if(profile?.role!=='admin'){v.innerHTML='<p class="m">Accè
  $('#af').onchange=e=>{const f=e.target.files[0];$('#afn').textContent=f?'✓ '+f.name+' ('+(f.size/1048576).toFixed(1)+' Mo)':'Aucun fichier choisi'};
  $('#as').onclick=publish}
 };
-async function render(){clearInterval(hT);const v=$('#view');$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab||(tab==='admin'&&b.dataset.tab==='me')||(tab==='dl'&&b.dataset.tab==='lib')));v.innerHTML='<p class="m">Chargement…</p>';
+async function render(){clearInterval(hT);const v=$('#view');$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab||((tab==='admin'||tab==='studio'||tab==='mod')&&b.dataset.tab==='me')||(tab==='dl'&&b.dataset.tab==='lib')));v.innerHTML='<p class="m">Chargement…</p>';
  try{await views[tab](v)}catch(e){v.innerHTML=`<p class="m">Erreur : ${esc(e.message)}</p>`}v.insertAdjacentHTML('beforeend',FOOT())}
 
 async function ownSearch(q){const [a,g]=await Promise.all([SB.from('artists').select('id').eq('status','approved').ilike('name',`%${q}%`),SB.from('genres').select('id').ilike('name',`%${q}%`)]);
@@ -374,4 +374,5 @@ async function boot(){const {data}=await SB.auth.getSession();user=data.session?
  $('#auth').hidden=true;$('#app').hidden=false;$('#hb').hidden=!!user;if(!navigator.onLine&&tab==='home')tab='dl';tab==='admin'&&profile?.role!=='admin'&&(tab='home');render()}
 boot();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
-</script></body></html>
+</script>
+<script src="artistes.js"></script></body></html>

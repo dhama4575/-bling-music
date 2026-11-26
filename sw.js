@@ -1,4 +1,4 @@
-const C='bmm-v1',S=['./','./index.html','./manifest.webmanifest','./logo.png'];
+const C='bmm-v2',S=['./','./index.html','./manifest.webmanifest','./logo.png','./artistes.js'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(S)))});
 self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
 self.addEventListener('fetch',e=>{
