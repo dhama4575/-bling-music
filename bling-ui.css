@@ -144,3 +144,18 @@ footer{border-top:1px solid var(--line);margin-top:30px}
 }
 @media(max-width:899px){#mini #mvo{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Premium, accueil personnalisé */
+.pm{background:transparent;border:1px solid rgba(245,184,46,.55);color:var(--g2);border-radius:20px;padding:8px 14px;font-weight:800;font-size:12px;letter-spacing:.04em;flex:none}
+.pm.on{background:linear-gradient(135deg,var(--g2),var(--g));color:#1a1200;border-color:transparent}
+.prem{border-radius:20px;padding:18px;margin:12px 0;cursor:pointer;background:linear-gradient(135deg,#2a2008 0%,#6b4a0a 55%,#c8921c 130%);border:1px solid rgba(245,184,46,.35);box-shadow:0 14px 40px rgba(245,184,46,.12);display:flex;flex-direction:column;gap:6px;animation:up .6s var(--ease) both;transition:transform .2s var(--ease)}
+.prem:hover{transform:translateY(-2px)}.prem .k{font-size:11px;font-weight:800;letter-spacing:.18em;color:var(--g2)}
+.prem b{font:800 21px/1.15 "Avenir Next",Inter,sans-serif;letter-spacing:-.01em}.prem span{color:#ece4d0;font-size:13px}
+.prem .cta{align-self:flex-start;margin-top:10px;background:#fff;color:#111;border-radius:20px;padding:9px 18px;font-weight:800;font-size:13px}
+.prem.big{cursor:default;padding:30px 22px}.prem.big b{font-size:clamp(26px,6vw,40px)}.prem.big:hover{transform:none}
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qt{display:flex;align-items:center;gap:10px;background:var(--c2);border-radius:10px;overflow:hidden;cursor:pointer;padding-right:8px;border:1px solid var(--line);transition:background .15s}
+.qt:hover{background:var(--c3)}.qt .cv{width:52px;height:52px;border-radius:0;flex:none;box-shadow:none}
+.qt b{font-size:13px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+@media(min-width:700px){.qg{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:430px){header .hbtn{display:none}}

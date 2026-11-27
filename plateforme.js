@@ -67,7 +67,7 @@ views.awards=async v=>{
 
 /* ---------- Promotion et publicité affichées ---------- */
 const adC={};
-async function adHtml(code){const c=adC[code];if(c&&Date.now()-c.t<300000)return c.h;let h='';
+async function adHtml(code){if(['premium','family'].includes(window.PLAN))return '';const c=adC[code];if(c&&Date.now()-c.t<300000)return c.h;let h='';
  try{const t=today(),{data}=await SB.from('ad_campaigns').select('id,company,title,image_url,link_url,ad_slots!inner(code)').eq('ad_slots.code',code).eq('status','approved').lte('starts_on',t).gte('ends_on',t).limit(1);
   const a=data?.[0];if(a)h=`<div class="tile" ${a.link_url?`data-adlink="${E(a.link_url)}"`:''} style="margin:10px 0;padding:0;overflow:hidden">${a.image_url?`<img src="${E(a.image_url)}" alt="" style="width:100%;display:block" onerror="this.remove()">`:''}<span style="padding:6px 10px;display:block">Publicité · ${E(a.company)} — ${E(a.title)}</span></div>`}catch(e){}
  adC[code]={t:Date.now(),h};return h}
@@ -136,7 +136,7 @@ views.pilot=async v=>{
   SB.from('ledger_entries').select('kind,direction,amount_fcfa,created_at').order('created_at',{ascending:false}).limit(15)]);
  const RO=['user','artist','moderator','editor','admin'];
  v.innerHTML=`<h2>🧭 Pilotage BLING MONEY MUSIC</h2><div class="tl">${[[N(d.users),'comptes'],[N(d.artists),'artistes pro'],[N(d.applications_pending),'dossiers artistes'],[N(d.tracks_pending),'titres à vérifier'],[N(d.concerts_pending),'concerts à valider'],[N(d.ads_pending),'pubs à valider'],[N(d.reports_open),'signalements'],[N(d.withdrawals_pending)+' · '+F(d.withdrawals_pending_fcfa),'retraits en attente'],[F(d.platform_balance),'commissions'],[F(d.deposits_fcfa),'dépôts reçus'],[N(d.listens_7d),'écoutes validées · 7 j']].map(x=>tile(...x)).join('')}</div>
- <div class="tl">${[['mod','🛡 Modération'],['finance','📊 Finances'],['cinadmin','🎞 Cinéma'],['promoadmin','🖼 Promotions'],['ads','📣 Publicités'],['awards','🏅 Awards'],['admin','📝 Éditorial et titres'],['charts','🏆 Classements'],['audioaudit','🔊 Audit audio']].map(([k,n])=>`<div class="tile" data-go="${k}"><b>${n}</b></div>`).join('')}</div>
+ <div class="tl">${[['mod','🛡 Modération'],['finance','📊 Finances'],['cinadmin','🎞 Cinéma'],['promoadmin','🖼 Promotions'],['ads','📣 Publicités'],['awards','🏅 Awards'],['admin','📝 Éditorial et titres'],['charts','🏆 Classements'],['audioaudit','🔊 Audit audio'],['plansadmin','💳 Abonnements et commissions']].map(([k,n])=>`<div class="tile" data-go="${k}"><b>${n}</b></div>`).join('')}</div>
  <h2>Comptes</h2><input id="uq" type="search" placeholder="Rechercher un e-mail ou un nom" value="${E(q)}">${(us.data||[]).map(u=>`<div class="row"><div class="tx"><b>${E(u.display_name||u.email)}</b><span>${E(u.email)}</span></div><select data-urole="${u.id}" style="width:120px">${RO.map(r=>`<option ${r===u.role?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}
  <details><summary class="m">Contrats signés</summary>${(ct.data||[]).map(c=>`<p class="m" style="padding:2px 0">${E(c.artists?.name)} · ${c.version} · ${new Date(c.accepted_at).toLocaleDateString('fr-FR')}</p>`).join('')||'<p class="m">Aucun.</p>'}</details>
  <details><summary class="m">Dernières transactions</summary>${(tx.data||[]).map(x=>`<p class="m" style="padding:2px 0">${E(x.kind)} · ${x.direction==='credit'?'+':'−'}${F(x.amount_fcfa)} · ${new Date(x.created_at).toLocaleString('fr-FR')}</p>`).join('')||'<p class="m">Aucune.</p>'}</details>

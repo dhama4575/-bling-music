@@ -12,7 +12,7 @@ const uniq=l=>{const s=new Set();return l.filter(t=>!s.has(t.id)&&s.add(t.id))};
 
 views.home=async v=>{
  await refDL();
- const hist=user?SB.from('plays').select('tracks(genres(name))').eq('user_id',user.id).order('played_at',{ascending:false}).limit(30).then(r=>r.data||[]):Promise.resolve([]);
+ const hist=user?SB.from('plays').select('tracks(*,artists(name,verified,human_verified),genres(name))').eq('user_id',user.id).order('id',{ascending:false}).limit(40).then(r=>r.data||[]):Promise.resolve([]);
  const jobs=[
   SB.from('tracks').select(QS).eq('status','approved').order('published_at',{ascending:false}).limit(30).then(r=>(r.data||[]).map(norm)),
   aTrend(),aMulti(['afrobeat','afrobeats','africa']),aMulti(['amapiano']),aMulti(['gospel']),aMulti(['gabon','gabonais','libreville']),aTrend('Hip-Hop/Rap'),aTrend('R&B/Soul'),
@@ -20,12 +20,18 @@ views.home=async v=>{
   SB.from('artists').select('id,name,photo_url,verified,human_verified').eq('status','approved').not('user_id','is',null).order('created_at',{ascending:false}).limit(14).then(r=>r.data||[]),
   SB.from('releases').select('id,title,type,cover_url,artists(name)').eq('status','approved').order('created_at',{ascending:false}).limit(14).then(r=>r.data||[]),
   aMulti(['instrumental','type beat']),hist,
-  SB.from('beats').select('id,title,cover_url,exclusive_sold,beatmakers(name),beat_licenses(price_fcfa)').eq('status','approved').order('created_at',{ascending:false}).limit(14).then(r=>r.data||[])];
- const [own,tr,afro,ama,gos,gab,hip,rnb,fil,arts,rels,inst,hh,bts]=(await Promise.allSettled(jobs)).map(x=>x.value||[]);
+  SB.from('beats').select('id,title,cover_url,exclusive_sold,beatmakers(name),beat_licenses(price_fcfa)').eq('status','approved').order('created_at',{ascending:false}).limit(14).then(r=>r.data||[]),
+  SB.from('plans').select('price_month_fcfa').eq('code','premium').eq('active',true).maybeSingle().then(r=>r.data||[])];
+ const [own,tr,afro,ama,gos,gab,hip,rnb,fil,arts,rels,inst,hh,bts,pp]=(await Promise.allSettled(jobs)).map(x=>x.value||[]);
  if(!own.length&&!tr.length){v.innerHTML='<p class="m">Impossible de charger la musique. Vérifie ta connexion Internet, ou ouvre Biblio. puis Ma musique hors ligne.</p>';return}
  /* Section d'accueil */
  const hero=uniq([...own.slice(0,3),...tr.slice(0,6)]).filter(t=>t.cover).slice(0,6);L.hero=hero;
- let h=hero.length?`<div id="hero">${hero.map((t,i)=>`<div class="sl ${i?'':'on'}"><div class="bg" style="background-image:url('${E(encodeURI(t.cover).replace(/'/g,'%27'))}')"></div><div class="art"><img src="${E(t.cover)}" alt="" onerror="this.remove()"></div><div class="sc"><span class="k">${t.ext?'TENDANCE':'À LA UNE'}</span><span class="t">${E(t.title)}</span><span class="a">${E(t.artist)}</span><div class="bt"><button class="btn" data-play="hero:${i}">▶ Écouter</button><button class="btn s" data-go="explore">Découvrir</button></div></div></div>`).join('')}<div class="dots">${hero.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div></div>`:'';
+ /* Bonjour + reprise de l'écoute + offre Premium */
+ const seenR=new Set(),rp=[];hh.forEach(x=>{const t=x.tracks;if(t&&!seenR.has(t.id)&&rp.length<6){seenR.add(t.id);const n=norm(t);rp.push(n);T[n.id]=n}});L.rp=rp;
+ const nm=(profile?.display_name||'').split(' ')[0],hr=new Date().getHours(),isP=['premium','family'].includes(window.PLAN);
+ let h=`<section class="sx"><h2 style="margin-top:14px">${hr<5?'Bonne nuit':hr<18?'Bonjour':'Bonsoir'}${nm?', '+E(nm):''}</h2>${rp.length?`<div class="qg">${rp.map((t,i)=>`<div class="qt" data-play="rp:${i}"><div class="cv">${t.cover?`<img src="${E(t.cover)}" loading="lazy" alt="" onerror="this.remove()">`:''}</div><b>${E(t.title)}</b></div>`).join('')}</div>`:''}</section>`;
+ if(!isP&&pp&&pp.price_month_fcfa)h+=`<div class="prem" data-go="premium"><span class="k">BLING PREMIUM</span><b>Ta musique, sans publicité.</b><span>Dès ${Number(pp.price_month_fcfa).toLocaleString('fr-FR')} FCFA par mois. Annulation possible à tout moment.</span><span class="cta">Découvrir Premium</span></div>`;
+ h+=hero.length?`<div id="hero">${hero.map((t,i)=>`<div class="sl ${i?'':'on'}"><div class="bg" style="background-image:url('${E(encodeURI(t.cover).replace(/'/g,'%27'))}')"></div><div class="art"><img src="${E(t.cover)}" alt="" onerror="this.remove()"></div><div class="sc"><span class="k">${t.ext?'TENDANCE':'À LA UNE'}</span><span class="t">${E(t.title)}</span><span class="a">${E(t.artist)}</span><div class="bt"><button class="btn" data-play="hero:${i}">▶ Écouter</button><button class="btn s" data-go="explore">Découvrir</button></div></div></div>`).join('')}<div class="dots">${hero.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div></div>`:'';
  /* Artistes à découvrir : artistes BLING d'abord, puis artistes en tendance */
  const aOwn=arts.map(a=>({k:'own:'+a.id,name:a.name,img:a.photo_url,vf:a.verified,sub:'Artiste BLING'}));
  const seen=new Set(aOwn.map(a=>a.name.toLowerCase())),aExt=[];
