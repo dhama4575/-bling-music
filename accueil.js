@@ -19,8 +19,9 @@ views.home=async v=>{
   iaSearch('','feature_films',12),
   SB.from('artists').select('id,name,photo_url,verified,human_verified').eq('status','approved').not('user_id','is',null).order('created_at',{ascending:false}).limit(14).then(r=>r.data||[]),
   SB.from('releases').select('id,title,type,cover_url,artists(name)').eq('status','approved').order('created_at',{ascending:false}).limit(14).then(r=>r.data||[]),
-  aMulti(['instrumental','type beat']),hist];
- const [own,tr,afro,ama,gos,gab,hip,rnb,fil,arts,rels,inst,hh]=(await Promise.allSettled(jobs)).map(x=>x.value||[]);
+  aMulti(['instrumental','type beat']),hist,
+  SB.from('beats').select('id,title,cover_url,exclusive_sold,beatmakers(name),beat_licenses(price_fcfa)').eq('status','approved').order('created_at',{ascending:false}).limit(14).then(r=>r.data||[])];
+ const [own,tr,afro,ama,gos,gab,hip,rnb,fil,arts,rels,inst,hh,bts]=(await Promise.allSettled(jobs)).map(x=>x.value||[]);
  if(!own.length&&!tr.length){v.innerHTML='<p class="m">Impossible de charger la musique. Vérifie ta connexion Internet, ou ouvre Biblio. puis Ma musique hors ligne.</p>';return}
  /* Section d'accueil */
  const hero=uniq([...own.slice(0,3),...tr.slice(0,6)]).filter(t=>t.cover).slice(0,6);L.hero=hero;
@@ -47,7 +48,9 @@ views.home=async v=>{
  h+=sect('Tendances du moment','Ce que le monde écoute en ce moment',rail(tr,'tr'));
  h+=sect('Playlists','Des mixes pour chaque moment',mixH?`<div class="hs">${mixH}</div>`:'');
  h+=sect('Recommandé pour toi','D’après tes dernières écoutes',rec.length?rail(rec,'rec'):'');
- h+=sect('Productions et instrumentales','Instrumentales trouvées sur Audius. Les beatmakers BLING arrivent bientôt ici avec leurs ventes.',inst.length?rail(inst,'inst'):'');
+ const btH=bts.length?`<div class="hs">${bts.map((b,i)=>{const p=(b.beat_licenses||[]).map(x=>x.price_fcfa);return `<div class="card" data-beat="${b.id}" style="animation-delay:${Math.min(i,8)*60}ms"><div class="cv">${b.cover_url?`<img src="${E(b.cover_url)}" loading="lazy" alt="" onerror="this.remove()">`:''}<span class="pl">▶</span></div><b>${E(b.title)}</b><span>${E(b.beatmakers?.name||'')}${p.length?' · dès '+Math.min(...p).toLocaleString('fr-FR')+' FCFA':''}</span></div>`}).join('')}</div>`:'';
+ h+=sect('Productions et instrumentales','Achète une licence directement auprès des beatmakers BLING',btH||`<div class="tile" data-go="beats"><b>🎛 Découvre les beatmakers</b><span>Instrumentales à écouter et à acheter</span></div>`,'beats');
+ h+=sect('Instrumentales en écoute libre','Sélection Audius',inst.length?rail(inst,'inst'):'');
  h+=sect('Artistes mis en avant','Profils certifiés BLING VERIFIED',certA.length?`<div class="hs">${certA.map(avatar).join('')}</div>`:'');
  h+=sect('Afrobeat','',afro.length?rail(afro,'af'):'')+sect('Musiques gabonaises','',gab.length?rail(gab,'ga'):'')+sect('Amapiano','',ama.length?rail(ama,'am'):'');
  h+=vsec('Bling Cinéma · films gratuits',fil);
