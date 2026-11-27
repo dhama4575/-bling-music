@@ -14,7 +14,7 @@ const ST={pending:'En attente de vérification',approved:'Publié',rejected:'Ref
 const RL={author:'Auteur',composer:'Compositeur',producer:'Producteur',performer:'Interprète',mixer:'Mixage',mastering:'Mastering',label:'Label',other:'Autre'};
 const bd=a=>(a?.verified?' <b style="color:var(--g)" title="BLING VERIFIED">✔ Vérifié</b>':'')+(a?.human_verified?' <span class="bdg" style="background:#009e60;color:#000">Humain vérifié</span>':'');
 const sha=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(b=>b.toString(16).padStart(2,'0')).join('');
-const up=async(bk,p,f)=>{const u=await SB.storage.from(bk).upload(p,f);if(u.error)throw u.error;return u.data.path};
+const up=async(bk,p,f)=>{const u=await SB.storage.from(bk).upload(p,f,bk==='audio'?{contentType:mimeOf(f),cacheControl:'3600'}:undefined);if(u.error)throw u.error;return u.data.path};
 const pub=p=>SB.storage.from('covers').getPublicUrl(p).data.publicUrl;
 const last=a=>[...(a||[])].sort((x,y)=>y.created_at.localeCompare(x.created_at))[0];
 const names=s=>String(s||'').split(',').map(x=>x.trim()).filter(Boolean);
