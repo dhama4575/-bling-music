@@ -33,16 +33,17 @@ views.beats=async v=>{
 
 async function openBeat(id){const {data:b,error}=await SB.from('beats').select('*,beatmakers(id,user_id,name,verified),beat_licenses(id,kind,price_fcfa,terms)').eq('id',id).single();if(error)return toast(error.message);
  const t=mkT(b);T[t.id]=t;L.bd=[t];const lic=['basic','premium','exclusive'].map(k=>(b.beat_licenses||[]).find(x=>x.kind===k)).filter(Boolean);
- openReader(`<h2 style="margin-top:6px">${E(b.title)}</h2><p class="m"><a data-bm="${b.beatmakers.id}" style="color:var(--g);text-decoration:underline">${E(b.beatmakers.name)}</a>${b.beatmakers.verified?' ✔':''} · ${[b.genre,b.mood,b.bpm?b.bpm+' BPM':'',b.musical_key].filter(Boolean).map(E).join(' · ')}</p>${b.cover_url?`<img src="${E(b.cover_url)}" alt="" style="max-width:340px">`:''}<button class="btn" data-play="bd:0">▶ Écouter l’extrait</button>
+ openReader(`<h2 style="margin-top:6px">${E(b.title)}</h2><p class="m"><a data-bm="${b.beatmakers.id}" style="color:var(--g);text-decoration:underline">${E(b.beatmakers.name)}</a>${b.beatmakers.verified?' ✔':''} · ${[b.genre,b.mood,b.bpm?b.bpm+' BPM':'',b.musical_key].filter(Boolean).map(E).join(' · ')}</p>${b.cover_url?`<img src="${E(b.cover_url)}" alt="" style="max-width:340px">`:''}<button class="btn" data-play="bd:0">▶ Écouter l’extrait</button><button class="btn s" data-share="bt|${b.id}|${E(b.title)}">↗ Partager</button>
  <h2>Licences</h2>${lic.map(x=>`<div class="tile" style="margin:8px 0;cursor:default"><b>${LIC[x.kind][0]} · ${F(x.price_fcfa)}</b><span style="white-space:normal">${E(x.terms||LIC[x.kind][1])}</span>${b.exclusive_sold?'<span style="color:var(--g)">Vendue en exclusivité</span>':`<button class="btn" style="margin-top:10px" data-bbuy="${x.id}|${x.price_fcfa}|${LIC[x.kind][0]}">Acheter cette licence</button>`}</div>`).join('')||'<p class="m">Aucune licence proposée.</p>'}
  <h2>Contacter le beatmaker</h2><textarea id="bmt" rows="3" placeholder="Ton message…"></textarea><button class="btn s" data-bsend="${b.beatmakers.user_id}|${b.id}">Envoyer le message</button><p class="m" style="font-size:12px">Conditions de licence provisoires, à faire valider par un juriste avant le lancement officiel.</p>`)}
 
 /* ---------- Profil public d'un beatmaker ---------- */
 views.beatmaker=async v=>{
  if(!BM){tab='beats';return render()}
+ window.CUR_BM=BM;
  const [m,b]=await Promise.all([SB.from('beatmakers').select('*').eq('id',BM).single(),SB.from('beats').select(BSEL).eq('beatmaker_id',BM).eq('status','approved').order('created_at',{ascending:false})]);
  if(m.error)throw m.error;const x=m.data,l=b.data||[];L.bt=l.map(mkT);L.bt.forEach(t=>T[t.id]=t);
- v.innerHTML=`<button class="ic" data-bgo="beats">‹ Retour</button><div class="ap"><div class="bgi" style="background-image:url('${E(encodeURI(x.photo_url||'').replace(/'/g,'%27'))}')"></div><div class="pic">${im(x.photo_url)}</div><div><span class="m" style="font-size:12px;letter-spacing:.14em">BEATMAKER${x.verified?' · ✔ VÉRIFIÉ':''}</span><h1>${E(x.name)}</h1>${x.city?`<p class="m" style="padding:4px 0">${E(x.city)}</p>`:''}${x.bio?`<p class="bio">${E(x.bio)}</p>`:''}</div></div>
+ v.innerHTML=`<button class="ic" data-bgo="beats">‹ Retour</button><button class="ic" data-share="b|${x.id}|${E(x.name)}">↗ Partager</button><div class="ap"><div class="bgi" style="background-image:url('${E(encodeURI(x.photo_url||'').replace(/'/g,'%27'))}')"></div><div class="pic">${im(x.photo_url)}</div><div><span class="m" style="font-size:12px;letter-spacing:.14em">BEATMAKER${x.verified?' · ✔ VÉRIFIÉ':''}</span><h1>${E(x.name)}</h1>${x.city?`<p class="m" style="padding:4px 0">${E(x.city)}</p>`:''}${x.bio?`<p class="bio">${E(x.bio)}</p>`:''}</div></div>
  <h2>Instrumentales</h2>${l.map(row).join('')||'<p class="m">Aucune instrumentale publiée.</p>'}
  <h2>Contacter ${E(x.name)}</h2><textarea id="bmt" rows="3" placeholder="Ton message…"></textarea><button class="btn s" data-bsend="${x.user_id}|">Envoyer le message</button>`};
 

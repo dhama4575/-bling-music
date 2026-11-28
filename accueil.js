@@ -68,6 +68,7 @@ views.home=async v=>{
 /* ---------- Page artiste ---------- */
 views.artist=async v=>{
  if(!AP){tab='home';return render()}
+ window.CUR_ARTIST=AP;
  const [kind,key]=AP.split(/:(.+)/);let name,bio='',photo=null,vf=0,hv=0,id=null,l=[],rl=[],fc=0,fol=false;
  if(kind==='own'){id=key;
   const [a,t,r,f,me]=await Promise.all([SB.from('artists').select('*').eq('id',key).single(),SB.from('tracks').select(QS).eq('artist_id',key).eq('status','approved').order('published_at',{ascending:false}),
@@ -77,7 +78,7 @@ views.artist=async v=>{
  else{name=key;const r=await aSearch(key);l=r.filter(t=>t.artist.toLowerCase()===key.toLowerCase());if(!l.length)l=r;photo=l.find(t=>t.cover)?.cover||null}
  L.ap=l;l.forEach(t=>T[t.id]=t);
  v.innerHTML=`<button class="ic" data-aback>‹ Retour</button><div class="ap"><div class="bgi" style="background-image:url('${E(encodeURI(photo||'').replace(/'/g,'%27'))}')"></div><div class="pic">${photo?`<img src="${E(photo)}" alt="" onerror="this.remove()">`:''}</div><div><span class="m" style="font-size:12px;letter-spacing:.14em">ARTISTE${vf?' · ✔ VÉRIFIÉ':''}${hv?' · CRÉATION HUMAINE VÉRIFIÉE':''}</span><h1>${E(name)}</h1>${bio?`<p class="bio">${E(bio)}</p>`:''}${id?`<p class="m" style="padding:6px 0 0">${fc} abonné(s)</p>`:''}</div></div>
- <div class="seg" style="max-width:420px"><button class="on" data-play="ap:0" style="flex:2">▶ Écouter</button>${id?`<button data-follow="${id}" class="${fol?'':''}">${fol?'Abonné ✓':'Suivre'}</button>`:''}</div>`+
+ <div class="seg" style="max-width:420px"><button class="on" data-play="ap:0" style="flex:2">▶ Écouter</button>${id?`<button data-follow="${id}" class="${fol?'':''}">${fol?'Abonné ✓':'Suivre'}</button><button data-share="a|${id}|${E(name)}">↗ Partager</button>`:''}</div>`+
  (l.length?sec('Titres',l,'ap'):'<p class="m">Aucun titre disponible pour le moment.</p>')+
  (rl.length?`<h2>Discographie</h2><div class="hs">${rl.map(r=>`<div class="card" data-rel="${r.id}"><div class="cv">${r.cover_url?`<img src="${E(r.cover_url)}" loading="lazy" alt="" onerror="this.remove()">`:''}<span class="pl">▶</span></div><b>${E(r.title)}</b><span>${r.type==='album'?'Album':'Single'}</span></div>`).join('')}</div>`:'')};
 

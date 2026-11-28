@@ -22,9 +22,10 @@ views.pros=async v=>{
 
 views.pro=async v=>{
  if(!PRO){tab='pros';return render()}
+ window.CUR_PRO=PRO;
  const [p,s]=await Promise.all([SB.from('pro_profiles').select('*').eq('id',PRO).single(),SB.from('pro_services').select('*').eq('pro_id',PRO).order('created_at')]);
  if(p.error)throw p.error;const x=p.data,sv=s.data||[];
- v.innerHTML=`<button class="ic" data-go="pros">‹ Retour</button><div class="ap"><div class="bgi" style="background-image:url('${E(encodeURI(x.photo_url||'').replace(/'/g,'%27'))}')"></div><div class="pic">${im(x.photo_url)}</div><div><span class="m" style="font-size:12px;letter-spacing:.14em">${KL[x.kind].toUpperCase()}</span><h1>${E(x.name)}</h1>${x.city?`<p class="m" style="padding:4px 0">${E(x.city)}</p>`:''}${x.bio?`<p class="bio">${E(x.bio)}</p>`:''}</div></div>
+ v.innerHTML=`<button class="ic" data-go="pros">‹ Retour</button><button class="ic" data-share="r|${x.id}|${E(x.name)}">↗ Partager</button><div class="ap"><div class="bgi" style="background-image:url('${E(encodeURI(x.photo_url||'').replace(/'/g,'%27'))}')"></div><div class="pic">${im(x.photo_url)}</div><div><span class="m" style="font-size:12px;letter-spacing:.14em">${KL[x.kind].toUpperCase()}</span><h1>${E(x.name)}</h1>${x.city?`<p class="m" style="padding:4px 0">${E(x.city)}</p>`:''}${x.bio?`<p class="bio">${E(x.bio)}</p>`:''}</div></div>
  ${x.equipment?`<h2>Équipements et réalisations</h2><p class="m" style="white-space:pre-wrap;color:#ddd">${E(x.equipment)}</p>`:''}
  <h2>Services et tarifs</h2>${sv.map(a=>`<div class="row"><div class="tx"><b>${E(a.title)}</b><span style="white-space:normal">${E(a.description||'')}</span></div><span class="du">${a.price_fcfa!=null?F(a.price_fcfa):'Sur devis'}</span></div>`).join('')||'<p class="m">Services non renseignés : contacte directement le professionnel.</p>'}
  <h2>Envoyer une demande</h2><select id="psv"><option value="">Demande générale</option>${sv.map(a=>`<option value="${a.id}">${E(a.title)}</option>`).join('')}</select><input id="pdt" type="date" min="${new Date().toISOString().slice(0,10)}"><textarea id="pmg" rows="4" placeholder="Décris ton projet, tes besoins…"></textarea><button class="btn" data-rbook="${x.id}">Envoyer la demande</button><p class="m" style="font-size:12px">Le paiement se convient directement avec le professionnel. Le paiement en ligne des prestations est à développer.</p>
